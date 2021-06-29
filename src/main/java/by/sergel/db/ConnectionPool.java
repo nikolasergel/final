@@ -26,31 +26,34 @@ public class ConnectionPool {
         availableConnections = new ArrayBlockingQueue<Connection>(DEFAULT_POOL_SIZE);
         busyConnections = new ArrayBlockingQueue<Connection>(DEFAULT_POOL_SIZE);
         Properties properties = new Properties();
+        String propertiesPath = "src/main/resources/db.properties";
         try {
             DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
             try {
-                properties.load(new FileInputStream("src/main/resources/db.properties"));
+                properties.load(new FileInputStream(propertiesPath));
                 for (int i = 0; i < DEFAULT_POOL_SIZE; i++) {
-                    Connection connection = DriverManager.getConnection(properties.getProperty(URL_PROPERTY), properties);
+                    String url = properties.getProperty(URL_PROPERTY);
+                    Connection connection = DriverManager.getConnection(url, properties);
                     availableConnections.put(new ProxyConnection(connection));
                 }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                logger.error("Can't load or get property. Properties filepath: " + propertiesPath, e);
+            } catch (InterruptedException e){
+                logger.error("Exception was caught: ", e);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't register driver: ", e);
         }
     }
 
     public Optional<Connection> getConnection() {
-        if (availableConnections.size() > 0) {
-            try {
-                Connection connection = availableConnections.take();
-                busyConnections.put(connection);
-                return Optional.of(connection);
-            } catch (InterruptedException e) {
-                logger.error("Exception caught: ", e); //FIXME
-            }
+        try {
+            Connection connection = availableConnections.take();
+            busyConnections.put(connection);
+            return Optional.of(connection);
+        } catch (InterruptedException e) {
+            logger.error("Thread was interrupted: ", e);
+            Thread.currentThread().interrupt();
         }
         return Optional.empty();
     }
@@ -61,26 +64,32 @@ public class ConnectionPool {
             try {
                 availableConnections.put(connection);
             } catch (InterruptedException e) {
-                logger.error("Exception caught: ", e); //FIXME
+                logger.error("Thread was interrupted: ", e);
+                Thread.currentThread().interrupt();
             }
+        } else{
+            logger.warn("Trying to release connection that wasn't created in the connection pool!");
         }
     }
 
-    public void closePool() {
+    public void destroyPool() {
         try {
+            ProxyConnection proxyConnection;
             for (Connection connection : availableConnections) {
-                ((ProxyConnection) connection).closeConnection();
+                proxyConnection = (ProxyConnection) connection;
+                proxyConnection.closeConnection();
             }
             for (Connection connection : busyConnections) {
-                ((ProxyConnection) connection).closeConnection();
+                proxyConnection = (ProxyConnection) connection;
+                proxyConnection.closeConnection();
             }
             Enumeration<Driver> drivers = DriverManager.getDrivers();
             while (drivers.hasMoreElements()) {
                 Driver driver = drivers.nextElement();
                 DriverManager.deregisterDriver(driver);
             }
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+        } catch (SQLException e) {
+            logger.error("Can't close connection or deregister driver: ", e);
         }
     }
 
