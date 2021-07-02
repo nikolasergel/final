@@ -49,9 +49,9 @@ public class Author extends AbstractEntity{
     public int hashCode() {
         int c = 47;
         int result = c * super.hashCode();
-        result += c * (firstName == null ? 0 : firstName.hashCode());
-        result += c * (lastName == null ? 0 : lastName.hashCode());
-        result += c * (patronymic == null ? 0 : patronymic.hashCode());
+        result += firstName == null ? 0 : firstName.hashCode();
+        result += lastName == null ? 0 : lastName.hashCode();
+        result += patronymic == null ? 0 : patronymic.hashCode();
         return result;
     }
 

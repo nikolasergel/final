@@ -102,13 +102,13 @@ public class Book extends AbstractEntity {
         int c = 41;
         int result = c * super.hashCode();
         result += c * quantity;
-        result += c * (name == null ? 0 : name.hashCode());
-        result += c * (year == null ? 0 : year.hashCode());
-        result += c * (picture == null ? 0 : picture.hashCode()); //FIXME InputStream hashcode
-        result += c * (language == null ? 0 : language.hashCode());
-        result += c * (publisher == null ? 0 : publisher.hashCode());
-        result += c * (author == null ? 0 : author.hashCode());
-        result += c * (genre == null ? 0 : genre    .hashCode());
+        result += name == null ? 0 : name.hashCode();
+        result += year == null ? 0 : year.hashCode();
+        result += picture == null ? 0 : picture.hashCode(); //FIXME InputStream hashcode
+        result += language == null ? 0 : language.hashCode();
+        result += publisher == null ? 0 : publisher.hashCode();
+        result += author == null ? 0 : author.hashCode();
+        result += genre == null ? 0 : genre.hashCode();
         return result;
     }
 

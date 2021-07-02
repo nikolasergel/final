@@ -70,8 +70,8 @@ public class Order extends AbstractEntity {
     public int hashCode() {
         int c = 61;
         int result = c * super.hashCode();
-        result += c * (reservationDate == null ? 0 : reservationDate.hashCode());
-        result += c * (returnDate == null ? 0 : returnDate.hashCode());
+        result += reservationDate == null ? 0 : reservationDate.hashCode();
+        result += returnDate == null ? 0 : returnDate.hashCode();
         result += c * customer.getId();
         result += c * book.getId(); //FIXME use full hashcode or no?
         return result;

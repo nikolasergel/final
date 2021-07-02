@@ -46,16 +46,16 @@ public class ConnectionPool {
         }
     }
 
-    public Optional<Connection> getConnection() {
+    public Connection getConnection() {
+        Connection connection = null;
         try {
-            Connection connection = availableConnections.take();
+            connection = availableConnections.take();
             busyConnections.put(connection);
-            return Optional.of(connection);
         } catch (InterruptedException e) {
             logger.error("Thread was interrupted: ", e);
             Thread.currentThread().interrupt();
         }
-        return Optional.empty();
+        return connection;
     }
 
     public void releaseConnection(Connection connection) {

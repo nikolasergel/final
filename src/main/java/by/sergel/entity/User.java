@@ -12,6 +12,7 @@ public class User extends AbstractEntity{
     private String lastName;
     private String patronymic;
     private String phone;
+    private String confirmationCode;
     private InputStream picture;
     private UserStatus status;
     private UserRole role;
@@ -80,6 +81,14 @@ public class User extends AbstractEntity{
         this.picture = picture;
     }
 
+    public String getConfirmationCode() {
+        return confirmationCode;
+    }
+
+    public void setConfirmationCode(String confirmationCode) {
+        this.confirmationCode = confirmationCode;
+    }
+
     public UserStatus getStatus() {
         return status;
     }
@@ -111,6 +120,7 @@ public class User extends AbstractEntity{
                 Objects.equals(firstName, user.firstName) &&
                 Objects.equals(lastName, user.lastName) &&
                 Objects.equals(patronymic, user.patronymic) &&
+                Objects.equals(confirmationCode, user.confirmationCode) &&
                 Objects.equals(picture, user.picture) &&
                 Objects.equals(phone, user.phone) &&
                 status == user.status &&
@@ -129,6 +139,7 @@ public class User extends AbstractEntity{
         result += patronymic == null ? 0 : patronymic.hashCode();
         result += phone == null ? 0 : phone.hashCode();
         result += picture == null ? 0 : picture.hashCode();
+        result += confirmationCode == null ? 0 : confirmationCode.hashCode();
         result += status.ordinal() * c;
         result += role.ordinal() * c;
         return result;
@@ -145,6 +156,7 @@ public class User extends AbstractEntity{
                 .append(", lastName='").append(lastName).append('\'')
                 .append(", patronymic='").append(patronymic).append('\'')
                 .append(", phone='").append(phone).append('\'')
+                .append(", confirmationCode='").append(confirmationCode).append('\'')
                 .append(", status=").append(status)
                 .append(", role=").append(role).append(" }");
         return builder.toString();
