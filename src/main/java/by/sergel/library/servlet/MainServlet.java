@@ -1,14 +1,9 @@
-
-
 package by.sergel.library.servlet;
 
 import by.sergel.library.command.Command;
-import by.sergel.library.command.impl.GetHomePageCommand;
-import by.sergel.library.command.impl.GetLoginPageCommand;
-import by.sergel.library.command.impl.GetRegistrationPageCommand;
-import by.sergel.library.command.impl.TESTCommand;
+import by.sergel.library.command.CommandType;
+import by.sergel.library.command.Router;
 import by.sergel.library.pool.ConnectionPool;
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,7 +14,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/" })
+@WebServlet(urlPatterns = {"/main/*"})
 public class MainServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger();
     private static final String COMMAND = "command";
@@ -39,24 +34,17 @@ public class MainServlet extends HttpServlet {
 
     private void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String commandStr = request.getParameter(COMMAND);
-        Command command;
-        logger.info(commandStr);
-        command = switch (commandStr) {
-            case "home" -> new GetHomePageCommand();
-            case "login" -> new GetLoginPageCommand();
-            case "registration" -> new GetRegistrationPageCommand();
-            case "test" -> new TESTCommand();
-            default -> {
-                logger.error("Command not supported: " + commandStr);
-                yield Command.DEFAULT_COMMAND;
-            }
-        };
-        String path = command.process(request);
-        RequestDispatcher dispatcher = request.getRequestDispatcher(CONTEXT_PATH + path);
+        String commandName = request.getParameter(COMMAND);
+        Command command = CommandType.getCommand(commandName);
+        Router router = command.process(request);
+        dispatch(request, response, router);
+    }
 
-        System.out.println(getServletContext().getContextPath() + "/" + request.getHttpServletMapping().getMatchValue() + "/" + path);
-        dispatcher.forward(request, response);
+    private void dispatch(HttpServletRequest request, HttpServletResponse response, Router router) throws ServletException, IOException {
+        switch (router.getDispatcherType()){
+            case FORWARD -> request.getRequestDispatcher(CONTEXT_PATH + router.getPagePath()).forward(request, response);
+            case REDIRECT -> response.sendRedirect(CONTEXT_PATH + router.getPagePath());
+        }
     }
 
     @Override

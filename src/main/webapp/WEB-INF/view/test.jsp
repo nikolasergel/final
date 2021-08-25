@@ -1,17 +1,16 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: nikol
+  Date: 7/22/2021
+  Time: 9:54 PM
+  To change this template use File | Settings | File Templates.
+--%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page isELIgnored="false" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
 <html>
 <head>
-    <title>TEST</title>
+    <title>Title</title>
 </head>
 <body>
-    <p>Roles</p>
-    <h1>${lol}</h1>
-    <p>${ roles }</p>
-    <p>${ roles[0] }</p>
-    <p>${ roles[0].toLowerCase() }</p>
-    ${ roles[1].substring(2) }
+<h1>TEST</h1>
 </body>
 </html>
